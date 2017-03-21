@@ -2,8 +2,13 @@ package lv.tele2.javaschool.phonebook;
 
 import asg.cliche.Command;
 import asg.cliche.Param;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +33,48 @@ public class PhoneBook implements Serializable{
     @Command(abbrev = "l", name = "list", description = "Lists all records")
     public List<Record> list() {
         return recordList;
+    }
+
+    @Command
+    public void remove(int id){
+        for (Record r : recordList){
+            if(r.getId()==id ){
+                recordList.remove(r);
+                break;
+            }
+        }
+    }
+
+    @Command
+    public void generate(int AmountOfRecords){
+
+        for (int i = 0; i < AmountOfRecords; i++) {
+            generate();
+        }
+
+    }
+
+    @Command
+    public void generate(){
+        JSONObject obj = callNameFake();
+        System.out.println(obj.getString("name"));
+        System.out.println(obj.getString("phone_h"));
+
+        create(obj.getString("name"), obj.getString("phone_h"));
+    }
+
+    private JSONObject callNameFake() {
+        try{
+            URL url=new URL("http://api.namefake.com/english-uk/random");
+            try(InputStream is=url.openStream()){
+                JSONTokener t=new JSONTokener(is);
+                JSONObject obj=new JSONObject(t);
+
+                return obj;
+            }
+        }catch (IOException e){
+            return null;
+        }
     }
 
 }
